@@ -58,7 +58,7 @@ apk del mariadb mariadb-client mariadb-server
 # Install Node.js and npm
 apk add nodejs npm
 
-git status# Create a basic Node.js application
+# Create a basic Node.js application
 mkdir -p /var/www/nodejs-app
 touch /var/www/nodejs-app/server.js
 cat << 'EOF' > /var/www/nodejs-app/server.js
@@ -80,15 +80,6 @@ npm install -g pm2
 
 # Start the Node.js application with PM2
 pm2 start /var/www/nodejs-app/server.js
-pm2 save
-pm2 startup
-EOF
-
-# Install PM2 to manage the Node.js application
-npm install -g pm2
-
-# Start the Node.js application with PM2
-pm2 start /var/www/nodejs-app/app.js
 pm2 save
 pm2 startup
 
@@ -113,6 +104,4 @@ rc-service nginx restart
 
 echo "Setup complete. You can now access:"
 echo "- Static website at http://localhost/"
-echo "- Node.js application at http://localhost:8080/"
-
-echo "Setup complete. You can now access a static website and Node.js application on your Alpine Linux server."
+echo "- Node.js application at http://localhost:8080/ (proxied from Node.js running on port 3000)"
