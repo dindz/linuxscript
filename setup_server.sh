@@ -15,7 +15,7 @@ rc-update add php-fpm81 default
 rc-service php-fpm81 start
 
 # Configure NGINX for PHP
-cat << 'EOF' > /etc/nginx/conf.d/default.conf
+cat << 'EOF' > /etc/nginx/http.d/default.conf
 server {
     listen 80;
     server_name localhost;  # Using localhost since no domain name is set
@@ -106,7 +106,7 @@ pm2 start /var/www/nodejs-app/app.js
 pm2 save
 pm2 startup
 # Configure NGINX for Node.js
-cat << 'EOF' > /etc/nginx/conf.d/nodejs.conf
+cat << 'EOF' > /etc/nginx/http.d/nodejs.conf
 server {
     listen 8080;
     server_name localhost;
