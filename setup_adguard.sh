@@ -6,15 +6,16 @@ apk add curl tar
 
 # Download and install AdGuard Home
 echo "Downloading AdGuard Home..."
-curl -sSL https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.107.4/AdGuardHome_linux_amd64.tar.gz -o /tmp/adguardhome.tar.gz
-tar -xzf /tmp/adguardhome.tar.gz -C /opt
-rm /tmp/adguardhome.tar.gz
+curl -sSL https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.107.54/AdGuardHome_linux_386.tar.gz -o /tmp/AdGuardHome_linux_386.tar.gz
+tar -xzf /tmp/AdGuardHome_linux_386.tar.gz -C /opt
+rm /tmp/AdGuardHome_linux_386.tar.gz
 
 # Navigate to the AdGuardHome directory
 cd /opt/AdGuardHome
 
 # Run the setup wizard without specifying ports (default ports will be used initially)
 echo "Running the setup wizard..."
+chmod +x AdGuardHome
 ./AdGuardHome -s install
 
 # Output completion message
