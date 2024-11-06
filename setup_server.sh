@@ -17,15 +17,15 @@ rc-service nginx start
 # Configure NGINX for static website
 mkdir -p /var/www/html
 chown -R nginx:nginx /var/www/html
-cat << 'EOF' > /etc/nginx/http.d/default.conf
+cat << EOF > /etc/nginx/http.d/default.conf
 server {
     listen 80;
-    server_name localhost;
+    server_name 192.168.254.104;  # Replace with your Alpine machine's IP
     root /var/www/html;
     index index.html;
 
     location / {
-        try_files $uri $uri/ =404;
+        try_files \$uri \$uri/ =404;
     }
 }
 EOF
@@ -70,8 +70,8 @@ const server = http.createServer((req, res) => {
   res.end('Hello from Node.js!\n');
 });
 
-server.listen(3000, 'localhost', () => {
-  console.log('Node.js server running on http://localhost:3000/');
+server.listen(3000, '0.0.0.0', () => {
+  console.log('Node.js server running on http://0.0.0.0:3000/');
 });
 EOF
 
@@ -84,17 +84,17 @@ pm2 save
 pm2 startup
 
 # Configure NGINX for Node.js
-cat << 'EOF' > /etc/nginx/http.d/nodejs.conf
+cat << EOF > /etc/nginx/http.d/nodejs.conf
 server {
     listen 8080;
-    server_name localhost;
+    server_name 192.168.1.100;  # Replace with your Alpine machine's IP
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
     }
 }
 EOF
@@ -103,5 +103,5 @@ EOF
 rc-service nginx restart
 
 echo "Setup complete. You can now access:"
-echo "- Static website at http://localhost/"
-echo "- Node.js application at http://localhost:8080/ (proxied from Node.js running on port 3000)"
+echo "- Static website at http://192.168.254.104/"  # Replace with your Alpine machine's IP
+echo "- Node.js application at http://192.168.254.104:8080/ (proxied from Node.js running on port 3000)"
