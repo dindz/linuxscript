@@ -11,7 +11,7 @@ tar -xzf /tmp/adguardhome.tar.gz -C /opt
 rm /tmp/adguardhome.tar.gz
 
 # Navigate to the AdGuardHome directory
-cd /opt/AdGuardHome || exit
+cd /opt/AdGuardHome
 
 # Run the setup wizard without specifying ports (default ports will be used initially)
 echo "Running the setup wizard..."
@@ -24,6 +24,8 @@ sleep 5
 echo "Modifying configuration file for custom ports..."
 
 # Change the web interface port and DNS port (8081 and 5353 as example)
+
+touch /opt/AdGuardHome/AdGuardHome.yaml
 sed -i 's/"bind_port": 3000/"bind_port": 8081/' /opt/AdGuardHome/AdGuardHome.yaml
 sed -i 's/"port": 53/"port": 5353/' /opt/AdGuardHome/AdGuardHome.yaml
 
