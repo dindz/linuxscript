@@ -1,50 +1,55 @@
-#!/bin/sh
+#!/bin/ash
 
-# Update and install required packages
-apk update
-apk add --no-cache curl tar
+# Update and install necessary dependencies
+apk update && apk upgrade
+apk add curl tar
 
 # Download and install AdGuard Home
-curl -s -S -L https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz | tar -xzf - -C /opt
+echo "Downloading AdGuard Home..."
+curl -sSL https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.107.4/AdGuardHome_linux_amd64.tar.gz -o /tmp/adguardhome.tar.gz
+tar -xvzf /tmp/adguardhome.tar.gz -C /opt
+rm /tmp/adguardhome.tar.gz
 
-# Create AdGuard Home user and group
-addgroup -S adguard
-adduser -S -D -H -h /opt/AdGuardHome -s /sbin/nologin -G adguard adguard
+# Navigate to the AdGuardHome directory
+cd /opt/AdGuardHome
 
-# Set permissions
-chown -R adguard:adguard /opt/AdGuardHome
+# Run the setup wizard with custom ports
+echo "Running the setup wizard on custom ports..."
+./AdGuardHome -s install --web-port 8081 --dns-port 5353
 
-# Create AdGuard Home service file
-cat > /etc/init.d/adguardhome <<EOL
-#!/sbin/openrc-run
+# Create a service script for AdGuard Home
+echo "Creating service script for AdGuard Home..."
+cat <<EOF > /etc/init.d/adguardhome
+#!/bin/sh
+# Start/Stop the AdGuard Home service
 
-name="AdGuard Home"
-description="Network-wide ads & trackers blocking DNS server"
-command="/opt/AdGuardHome/AdGuardHome"
-command_args="-s run -h 0.0.0.0 -p 3333 --port 5353"
-command_user="adguard:adguard"
-pidfile="/run/adguardhome.pid"
+case "\$1" in
+start)
+  echo "Starting AdGuard Home"
+  /opt/AdGuardHome/AdGuardHome -s start
+  ;;
+stop)
+  echo "Stopping AdGuard Home"
+  /opt/AdGuardHome/AdGuardHome -s stop
+  ;;
+*)
+  echo "Usage: \$0 {start|stop}"
+  exit 1
+  ;;
+esac
+EOF
 
-depend() {
-    need net
-    use dns logger
-}
-
-start_pre() {
-    checkpath -d -m 0755 -o adguard:adguard /var/log/AdGuardHome
-}
-EOL
-
-# Make the service file executable
+# Make the service script executable
 chmod +x /etc/init.d/adguardhome
 
-# Add AdGuard Home to default runlevel
+# Add the service to startup
 rc-update add adguardhome default
 
 # Start AdGuard Home service
-rc-service adguardhome start
+echo "Starting AdGuard Home..."
+/opt/AdGuardHome/AdGuardHome -s start
 
-echo "AdGuard Home has been installed and started."
-echo "Please configure it by visiting http://YOUR_IP:3333"
-echo "The DNS server is running on port 5353."
-echo "You may need to modify your firewall rules to allow these ports."
+# Output completion message
+echo "AdGuard Home installation and setup complete!"
+echo "You can access the web interface at http://<your-server-ip>:8081 to configure it."
+echo "DNS service is running on port 5353."
