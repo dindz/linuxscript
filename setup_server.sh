@@ -3,11 +3,32 @@
 # Update and upgrade the system
 apk update && apk upgrade
 
+# Configure static IP address for eth0
+cat <<EOF > /etc/network/interfaces
+auto eth0
+iface eth0 inet static
+    address 192.168.254.104
+    netmask 255.255.255.0
+    gateway 192.168.254.254
+EOF
+
+# Restart networking service to apply changes
+/etc/init.d/networking restart
+
+# Restart all network-related services
+for service in $(rc-service -l | grep -E '(net|dhcp|dns|network)'); do
+    rc-service $service restart
+done
+# Verify the new IP configuration
+ip a show eth0
+
+echo "Static IP configuration complete and network services restarted."
+
+# Update and upgrade the system
+apk update && apk upgrade
+
 # Install NGINX
 apk add nginx
-
-# Remove PHP and related packages if they exist
-apk del php81 php81-fpm php81-mysqli php81-curl php81-json php81-mbstring php81-xml php81-xmlrpc php81-gd php81-ctype php81-opcache php81-zlib php81-session php81-phar php81-openssl php81-dom php81-pdo php81-pdo_mysql php81-tokenizer
 apk add wget curl
 
 # Enable and start NGINX
@@ -46,14 +67,8 @@ cat << 'EOF' > /var/www/html/index.html
 </html>
 EOF
 
-# Remove any existing WordPress files
-rm -rf /var/www/html/wp-*
-
 # Restart NGINX to apply changes
 rc-service nginx restart
-
-# Remove MariaDB if it was installed
-apk del mariadb mariadb-client mariadb-server
 
 # Install Node.js and npm
 apk add nodejs npm
