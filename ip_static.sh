@@ -15,7 +15,11 @@ EOF
 # Restart networking service to apply changes
 /etc/init.d/networking restart
 
+# Restart all network-related services
+for service in $(rc-service -l | grep -E '(net|dhcp|dns|network)'); do
+    rc-service $service restart
+done
 # Verify the new IP configuration
 ip a show eth0
 
-echo "Static IP configuration complete."
+echo "Static IP configuration complete and network services restarted."
