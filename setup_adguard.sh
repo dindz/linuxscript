@@ -13,6 +13,10 @@ rm /tmp/AdGuardHome_linux_386.tar.gz
 # Navigate to the AdGuardHome directory
 cd /opt/AdGuardHome
 
+#stop the pm2 server of nodejs
+pm2 stop
+pm2 kill
+
 # Run the setup wizard without specifying ports (default ports will be used initially)
 echo "Running the setup wizard..."
 chmod +x AdGuardHome
