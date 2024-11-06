@@ -6,6 +6,8 @@ apk update && apk upgrade
 # Install NGINX, PHP, PHP-FPM, and necessary PHP extensions
 apk add nginx php81 php81-fpm php81-mysqli php81-curl php81-json php81-mbstring php81-xml php81-xmlrpc php81-gd php81-ctype php81-opcache php81-zlib php81-session php81-phar php81-openssl php81-dom php81-pdo php81-pdo_mysql php81-tokenizer
 
+apk add wget curl
+
 # Enable and start NGINX
 rc-update add nginx default
 rc-service nginx start
@@ -15,6 +17,8 @@ rc-update add php-fpm81 default
 rc-service php-fpm81 start
 
 # Configure NGINX for PHP
+mkdir -p /var/www/html
+chown -R nginx:nginx /var/www/html
 cat << 'EOF' > /etc/nginx/http.d/default.conf
 server {
     listen 80;
