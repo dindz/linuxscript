@@ -7,11 +7,11 @@ apk add curl tar
 # Download and install AdGuard Home
 echo "Downloading AdGuard Home..."
 curl -sSL https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.107.4/AdGuardHome_linux_amd64.tar.gz -o /tmp/adguardhome.tar.gz
-tar -xvzf /tmp/adguardhome.tar.gz -C /opt
+tar -xzf /tmp/adguardhome.tar.gz -C /opt
 rm /tmp/adguardhome.tar.gz
 
 # Navigate to the AdGuardHome directory
-cd /opt/AdGuardHome
+cd /opt/AdGuardHome || exit
 
 # Run the setup wizard without specifying ports (default ports will be used initially)
 echo "Running the setup wizard..."
@@ -24,29 +24,28 @@ sleep 5
 echo "Modifying configuration file for custom ports..."
 
 # Change the web interface port and DNS port (8081 and 5353 as example)
-sed -i 's/"http_port": 3000/"http_port": 8081/' /opt/AdGuardHome/AdGuardHome.yaml
-sed -i 's/"dns_port": 53/"dns_port": 5353/' /opt/AdGuardHome/AdGuardHome.yaml
+sed -i 's/"bind_port": 3000/"bind_port": 8081/' /opt/AdGuardHome/AdGuardHome.yaml
+sed -i 's/"port": 53/"port": 5353/' /opt/AdGuardHome/AdGuardHome.yaml
 
 # Create a service script for AdGuard Home
 echo "Creating service script for AdGuard Home..."
 cat <<EOF > /etc/init.d/adguardhome
-#!/bin/sh
-# Start/Stop the AdGuard Home service
+#!/sbin/openrc-run
 
-case "\$1" in
-start)
-  echo "Starting AdGuard Home"
-  /opt/AdGuardHome/AdGuardHome -s start
-  ;;
-stop)
-  echo "Stopping AdGuard Home"
-  /opt/AdGuardHome/AdGuardHome -s stop
-  ;;
-*)
-  echo "Usage: \$0 {start|stop}"
-  exit 1
-  ;;
-esac
+name="AdGuard Home"
+description="Network-wide ads & trackers blocking DNS server"
+command="/opt/AdGuardHome/AdGuardHome"
+command_args="-s run"
+pidfile="/run/adguardhome.pid"
+
+depend() {
+    need net
+    use dns logger
+}
+
+start_pre() {
+    checkpath -d -m 0755 -o root:root /var/log/AdGuardHome
+}
 EOF
 
 # Make the service script executable
@@ -57,7 +56,7 @@ rc-update add adguardhome default
 
 # Start AdGuard Home service
 echo "Starting AdGuard Home..."
-/opt/AdGuardHome/AdGuardHome -s start
+rc-service adguardhome start
 
 # Output completion message
 echo "AdGuard Home installation and setup complete!"
