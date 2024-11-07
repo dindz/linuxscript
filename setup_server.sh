@@ -7,9 +7,9 @@ apk update && apk upgrade
 cat <<EOF > /etc/network/interfaces
 auto eth0
 iface eth0 inet static
-    address 192.168.254.104
+    address 192.168.88.115
     netmask 255.255.255.0
-    gateway 192.168.254.254
+    gateway 192.168.88.1
 EOF
 
 # Restart networking service to apply changes
@@ -41,7 +41,7 @@ chown -R nginx:nginx /var/www/html
 cat << EOF > /etc/nginx/http.d/default.conf
 server {
     listen 80;
-    server_name 192.168.254.104;  # Replace with your Alpine machine's IP
+    server_name 192.168.88.115;  # Replace with your Alpine machine's IP
     root /var/www/html;
     index index.html;
 
@@ -86,7 +86,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(3000, '0.0.0.0', () => {
-  console.log('Node.js server running on http://0.0.0.0:3000/');
+  console.log('Node.js server running on http://0.0.0.0:7000/');
 });
 EOF
 
@@ -102,9 +102,9 @@ pm2 startup
 cat << EOF > /etc/nginx/http.d/nodejs.conf
 server {
     listen 8080;
-    server_name 192.168.1.100;  # Replace with your Alpine machine's IP
+    server_name 192.168.88.115;  # Replace with your Alpine machine's IP
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:7000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -118,5 +118,5 @@ EOF
 rc-service nginx restart
 
 echo "Setup complete. You can now access:"
-echo "- Static website at http://192.168.254.104/"  # Replace with your Alpine machine's IP
-echo "- Node.js application at http://192.168.254.104:8080/ (proxied from Node.js running on port 3000)"
+echo "- Static website at http://192.168.88.115/"  # Replace with your Alpine machine's IP
+echo "- Node.js application at http://192.168.88.115:8080/ (proxied from Node.js running on port 7000)"
