@@ -85,7 +85,7 @@ const server = http.createServer((req, res) => {
   res.end('Hello from Node.js!\n');
 });
 
-server.listen(3000, '0.0.0.0', () => {
+server.listen(7000, '0.0.0.0', () => {
   console.log('Node.js server running on http://0.0.0.0:7000/');
 });
 EOF
