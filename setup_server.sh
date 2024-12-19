@@ -7,9 +7,9 @@ apk update && apk upgrade
 cat <<EOF > /etc/network/interfaces
 auto eth0
 iface eth0 inet static
-    address 192.168.88.115
+    address 192.168.254.108
     netmask 255.255.255.0
-    gateway 192.168.88.1
+    gateway 192.168.254.254
 EOF
 
 # Restart networking service to apply changes
@@ -118,5 +118,5 @@ EOF
 rc-service nginx restart
 
 echo "Setup complete. You can now access:"
-echo "- Static website at http://192.168.88.115/"  # Replace with your Alpine machine's IP
-echo "- Node.js application at http://192.168.88.115:8080/ (proxied from Node.js running on port 7000)"
+echo "- Static website at http://192.168.254.108/"  # Replace with your Alpine machine's IP
+echo "- Node.js application at http://192.168.254.108:8080/ (proxied from Node.js running on port 7000)"
