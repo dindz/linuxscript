@@ -1,0 +1,30 @@
+{
+    "description": "Base firewall policy",
+    "interface": {
+        "net": "eth3"
+    },
+    "zone": {
+        "lan": {
+            "interface": "net"
+        }
+    },
+    "policy": [
+        {
+            "in": "lan",
+            "action": "drop"
+        }
+    ],
+    "filter": [
+        {
+            "in": "lan",
+            "service": "ssh",
+            "action": "accept"
+        },
+        {
+            "in": "lan",
+            "proto": "tcp",
+            "dport": ["80", "8080", "8081"],
+            "action": "accept"
+        }
+    ]
+}
